@@ -9,7 +9,7 @@ function poll()
    local data = fetched.readAll()
     if data == nil or data == '' then
     else
-        print "Got a program:
+        print "Got a program:"
         print "--------------------------"
         local func = loadstring(data)
         print(data)
@@ -56,11 +56,6 @@ function sleep(seconds)
     -- os.execute("sleep " .. seconds)
 end
 
-while true do
-    poll()
-    sleep(1)
-end
-
 print("---------------------------")
 print("Remote Executor version 1.0")
 print("---------------------------")
@@ -75,3 +70,8 @@ end
 print("Registering @ " .. registerPath)
 http.get(registerPath .. "/" .. identity )
 print("Computer " .. identity .. " is ready.")
+
+while true do
+    poll()
+    sleep(1)
+end
