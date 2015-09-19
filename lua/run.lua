@@ -39,15 +39,15 @@ local function writeUuid()
     local file = fs.open("uuid.txt", "w")
     local thisUuid = uuid()
     print("Writing uuid " .. thisUuid .. " to disk.")
-    file:write(thisUuid)
-    file:close()
+    file.write(thisUuid)
+    file.close()
     return thisUuid
 end
 
 local function readUuid()
     local file = fs.open("uuid.txt", "r")
-    local lineAll = file:read("*all")
-    file:close()
+    local lineAll = file.read("*all")
+    file.close()
     return lineAll
 end
 
