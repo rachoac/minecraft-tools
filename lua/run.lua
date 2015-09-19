@@ -1,6 +1,11 @@
-local server = "aron-eepc:8080"
+local server = "localhost:8080"
 local fetchPath = "http://"..server.."/fetch"
 local registerPath = "http://"..server.."/register"
+args = {...}
+local script = args[1]
+if script == nil or script == "" then
+   script = "test.lua"
+end
 
 math.randomseed( os.time() )
 
@@ -57,9 +62,8 @@ function sleep(seconds)
 end
 
 print("---------------------------")
-print("Remote Executor version 1.0")
+print("Remote Executor version 1.1")
 print("---------------------------")
-
 
 if not uuidExists() then
     identity = writeUuid()
@@ -68,8 +72,8 @@ else
 end
 
 print("Registering @ " .. registerPath)
-http.get(registerPath .. "/" .. identity )
-print("Computer " .. identity .. " is ready.")
+http.get(registerPath .. "/" .. identity .. "/" .. script)
+print("Computer " .. identity .. " is ready to execute script " .. script .. ".")
 
 while true do
     poll()
