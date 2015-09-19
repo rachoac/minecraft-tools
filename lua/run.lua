@@ -52,8 +52,7 @@ local function readUuid()
 end
 
 function uuidExists()
-    local f=fs.open("uuid.txt","r")
-    if f~=nil then fs.close(f) return true else return false end
+    return fs.exists("uuid.txt")
 end
 
 function sleep(seconds)
