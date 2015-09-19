@@ -46,7 +46,7 @@ end
 
 local function readUuid()
     local file = fs.open("uuid.txt", "r")
-    local lineAll = file.read("*all")
+    local lineAll = file.readAll()
     file.close()
     return lineAll
 end
