@@ -49,7 +49,19 @@ app.get('/set', function( req, res) {
     res.send(200);
 });
 
-app.post('/set', function(req, res){
+app.post('/set/:label/:filename', function(req, res) {
+    var label = req.param('label');
+    if ( !label ) {
+        label = 'general';
+    }
+    var filename = req.param('filename');
+    if ( !filename ) {
+        res.sendStatus(400);
+        return;
+    }
+    console.log("----------------------------------------")
+    console.log("label:", label, "filename:", filename);
+    console.log("content: ");
     console.log(req.text);
     res.sendStatus(200);
 });
