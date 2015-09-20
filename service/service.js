@@ -19,34 +19,48 @@ app.use(function(req, res, next){
   }
 });
 
-app.get('/fetch/:id', function(req, res, next) {
-    var id = req.param('id');
-    var run = runMap[id];
-    if ( !run ) {
+app.get('/fetch/:userID/:scriptID', function(req, res, next) {
+    var userID = req.param('userID');
+    var scriptID = req.param('scriptID');
+
+    if ( !scriptMap[scriptID] ) {
+        // the script doesn't exist - noop
+        console.log("script doesn't exist: ", scriptID);
         res.send("", 200);
-    } else {
-        var path = "../lua/" + scriptMap[id];
-        var data = fs.readFileSync(path, "utf8");
-        res.send(data, 200);
-        runMap[id] = false;
+        return;
     }
+
+    var userRunMap = runMap[userID];
+    if ( !userRunMap ) {
+        // lazily create the user program runMap
+        userRunMap = {};
+        runMap[userID] = userRunMap;
+    }
+
+    if ( !userRunMap[scriptID] ) {
+        // the script isn't ready to run for the user - noop
+        res.send("", 200);
+        console.log("script", scriptID, "isn't ready to run for user", userID);
+        return;
+    }
+
+    // the script is ready to run
+    var data = scriptMap[scriptID];
+    if ( !data ) {
+        // send empty
+        data = "";
+    }
+
+    // indicate that the script is not ready to run
+    userRunMap[scriptID] = false;
+
+    res.send(data, 200);
 });
 
-app.get('/register/:id/:script', function(req, res, next) {
-    var id = req.param('id');
-    var script = req.param('script');
-    runMap[id] = true;
-    scriptMap[id] = script;
+app.get('/register/:userID', function(req, res, next) {
+    var userID = req.param('userID');
+    runMap[userID] = {};
     res.send("", 200);
-});
-
-app.get('/set', function( req, res) {
-    for ( var id in runMap ) {
-        if ( runMap.hasOwnProperty(id) ) {
-            runMap[id] = true;
-        }
-    }
-    res.send(200);
 });
 
 app.post('/set/:label/:filename', function(req, res) {
@@ -56,6 +70,7 @@ app.post('/set/:label/:filename', function(req, res) {
     }
     var filename = req.param('filename');
     if ( !filename ) {
+        console.log("Filename not provided!");
         res.sendStatus(400);
         return;
     }
@@ -63,6 +78,30 @@ app.post('/set/:label/:filename', function(req, res) {
     console.log("label:", label, "filename:", filename);
     console.log("content: ");
     console.log(req.text);
+
+    var scriptID = label + "-" + filename;
+
+    console.log("Registering", scriptID);
+
+    // store the script
+    scriptMap[scriptID] = req.text;
+
+    // indicate that the script is ready to run
+    // for all registered users
+    for ( var userID in runMap ) {
+        if ( runMap.hasOwnProperty(userID) ) {
+            var userRunMap = runMap[userID];
+            if ( !userRunMap ) {
+                // lazily create the user program runMap
+                userRunMap = {};
+                runMap[userID] = userRunMap;
+            }
+
+            // flag the program as ready to run for the user (since its been updated)
+            userRunMap[scriptID] = true;
+        }
+    }
+
     res.sendStatus(200);
 });
 
