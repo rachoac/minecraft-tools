@@ -8,8 +8,15 @@ var express = require("express"),
 var runMap = {};
 var scriptMap = {};
 
-app.get("/", function (req, res) {
-    res.redirect("/index.html");
+app.use(function(req, res, next){
+  if (req.is('text/*')) {
+    req.text = '';
+    req.setEncoding('utf8');
+    req.on('data', function(chunk){ req.text += chunk });
+    req.on('end', next);
+  } else {
+    next();
+  }
 });
 
 app.get('/fetch/:id', function(req, res, next) {
@@ -42,10 +49,9 @@ app.get('/set', function( req, res) {
     res.send(200);
 });
 
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+app.post('/set', function(req, res){
+    console.log(req.text);
+    res.sendStatus(200);
+});
 
 app.listen(port);
