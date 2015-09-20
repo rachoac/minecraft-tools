@@ -6,11 +6,16 @@ local script = args[1]
 if script == nil or script == "" then
    script = "test.lua"
 end
+local label = os.getComputerLabel()
+if ( label == nil or label == "" ) then
+    label = "general"
+end
 
 math.randomseed( os.time() )
 
 function poll()
-   local fetched = http.get(fetchPath .. "/" .. identity )
+   local scriptID = label .. "-" .. script
+   local fetched = http.get(fetchPath .. "/" .. identity .. "/" .. scriptID)
    local data = fetched.readAll()
     if data == nil or data == '' then
     else
@@ -71,7 +76,7 @@ else
 end
 
 print("Registering @ " .. registerPath)
-http.get(registerPath .. "/" .. identity .. "/" .. script)
+http.get(registerPath .. "/" .. identity )
 print("Computer " .. identity .. " is ready to execute script " .. script .. ".")
 
 while true do
