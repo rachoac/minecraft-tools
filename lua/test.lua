@@ -1,4 +1,1 @@
-turtle.refuel()
-turtle.forward()
-turtle.turnRight()
-turtle.attack()
+print("Hello world")
